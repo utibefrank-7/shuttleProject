@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "accounts",
+    "django_extensions",
+    "tailwind",
+    "theme",
 ]
 
 MIDDLEWARE = [
@@ -49,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+TAILWIND_APP_NAME ="theme"
 
 ROOT_URLCONF = "shuttle.urls"
 
@@ -57,13 +61,17 @@ LOGIN_URL ="login"
 SESSION_COOKIE_AGE =1800
 SESSION_EXPIRE_AT_BROWSER_CLOSE=True
 
+MEDIA_URL ="/media/"
+MEDIA_ROOT =BASE_DIR / "media"
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR/"templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                'django.template.context_processors.debug',
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",

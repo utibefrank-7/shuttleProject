@@ -4,7 +4,11 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .decorators import role_required
 from django.contrib.auth import logout
-
+from django.http import HttpResponseForbidden
+from .models import Driverprofile, DriverApplication,Bus
+from .forms import DriverprofileForm, DriverApplicationForm,BusForm
+from django.contrib import messages
+from django.shortcuts import get_object_or_404
 
 
 
@@ -12,6 +16,11 @@ from django.contrib.auth import logout
 # Create your views here.
 def home_view(request):
     return render (request, "accounts/home.html")
+def about_view(request):
+    return render (request, "accounts/About.html" )
+
+def feartures_view(request):
+    return render(request, "accounts/features.html" )
 
 def signup_view(request):
     if request.method =="POST":
@@ -61,20 +70,277 @@ def login_view(request):
 @login_required
 @role_required(allowed_roles=["driver"])#middleware protection
 def driver_dashboard_view(request):
-    return render(request,"accounts/driver_dashboard.html")
 
+    user = request.user
+
+    if user.role!="driver":
+        return HttpResponseForbidden("Access Denied")
+    application = DriverApplication.objects.filter(driver=user).order_by("created_at").first()
+
+    context ={
+        "application":application
+    }
+    return render(request,"accounts/driver_dashboard.html", context)
+
+
+
+@login_required
+def driver_profile_view(request):
+    user= request.user
+
+    if user.role!= "driver":
+        return HttpResponseForbidden(
+            'only driver allowed.'
+        )
+    
+  # Get or create profile
+    profile, created = Driverprofile.objects.get_or_create(
+        user=user
+    )
+
+    context = {
+
+        "user": user,
+        "profile": profile,
+
+    }
+
+    return render(
+        request,
+        "accounts/driver_profile.html",
+        context
+    )
+@login_required
+def driver_profile_update_view(request):
+    user =request.user
+
+    if user.role !="driver":
+        return HttpResponseForbidden("only driver allowed")
+    profile, created = Driverprofile.objects.get_or_create(
+        user=request.user
+    )
+
+    if request.method=="POST":
+        form =DriverprofileForm(
+            request.POST,
+            request.FILES,
+            instance=profile
+    )
+        if form.is_valid():
+
+            form.save()
+            return redirect("driver_profile")
+    else:
+        form= DriverprofileForm(instance=profile)
+    
+    return render(
+
+        request,
+        "accounts/driver_profile_update.html",{"form":form}
+    )    
+    
+@login_required
+def driver_application_view(request):
+
+    user = request.user
+
+    # Only drivers allowed
+    if user.role != "driver":
+        return HttpResponseForbidden(
+            "Only Drivers can Apply. You are not signed up as a Driver."
+        )
+
+    # Prevent multiple pending applications
+    active_application = DriverApplication.objects.filter(
+        driver=user,
+        status="pending"
+    ).first()
+
+    if active_application:
+        return render(
+            request,
+            "accounts/already_applied.html"
+        )
+
+    # Handle form submission
+    if request.method == "POST":
+
+        form = DriverApplicationForm(request.POST)
+
+        if form.is_valid():
+
+            application = form.save(commit=False)
+
+            application.driver = user
+
+            application.save()
+            messages.success(
+                request, "your application has been submitted successfully."
+            )
+
+            return redirect("driver_dashboard")
+
+    else:
+        form = DriverApplicationForm()
+        messages.error(request, "you already have a pending application.")
+
+    return render(
+        request,
+        "accounts/driver_application.html",
+        {"form": form}
+    )
 
 @login_required
 @role_required(allowed_roles=["owner"]) #middleware protection
 def owner_dashboard_view(request):
-    return render(request,'accounts/owner_dashboard.html')
+
+    buses =Bus.objects.filter(owner=request.user)
+
+    return render(request,'accounts/owner_dashboard.html',
+                  {
+                  "buses":buses    
+
+                  }
+    )
+
+
+@login_required
+def register_bus_view(request):
+    if request.user.role !="owner":
+        return HttpResponseForbidden()
+    
+    if request.method =="POST":
+        form =BusForm(request.POST)
+
+        if form.is_valid():
+            bus = form.save(commit=False)
+            bus.owner = request.user
+            bus.status ="pending"
+            bus.save()
+            return redirect("owner_dashboard")
+        
+    else:
+        form=BusForm()
+    return render(request, "accounts/register_bus.html", {"form":form}
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+   
+@login_required
+def admin_dashboard_view(request):
+    if request.user.role !="admin":
+        return HttpResponseForbidden("you're forbidden to use this Url ")
+    
+    applications = DriverApplication.objects.all()
+    buses  =Bus.objects.all()
+    drivers =Driverprofile.objects.all()
+
+    context ={
+        "applications":applications,
+        "buses":buses,
+        "drivers":drivers
+    }
+    return render(
+        request, "accounts/admin_dashboard.html",
+        context
+    )
+@login_required
+def approve_bus_view(request, id):
+    if request.user.role !="admin":
+        return HttpResponseForbidden()
+    bus = Bus.objects.get(id=id)
+    bus.status="approved"
+    bus.save()
+    return redirect("admin_dashboard")
+
+@login_required
+def reject_bus_view(request, id):
+    if request.user.role !="admin":
+        return HttpResponseForbidden()
+    bus = Bus.objects.get(id=id)
+    bus.status="reject"
+    bus.save()
+    return redirect("admin_dashboard")
+
+
+
+
+
+@login_required
+def approve_application_view(request,id):
+
+    if request.user.role != "admin":
+
+        return HttpResponseForbidden()
+
+    application = DriverApplication.objects.get(id=id)
+
+    application.status="approved"
+
+    application.save()
+
+    return redirect("admin_dashboard")
+
+
+
+@login_required
+def reject_application_view(request,id):
+
+    if request.user.role != "admin":
+
+        return HttpResponseForbidden()
+
+    application = DriverApplication.objects.get(id=id)
+
+    application.status="rejected"
+
+    application.save()
+
+    return redirect("admin_dashboard")
+
+def assign_driver_view(request, bus_id):
+   
+   if request.method =="POST":
+       
+         driver_id =request.POST.get("driver_id")
+         driver =get_object_or_404(Driverprofile, id=driver_id)
+         bus =get_object_or_404(Bus, id=bus_id)
+        
+         bus.driver =driver
+         bus.save()
+
+   return redirect("admin_dashboard")
+
 
 
 def logout_view(request):
-    logout(request)
-    
-    return redirect("login")
 
+    logout(request)
+
+    return redirect("login")
 
 # @login_required
 # def admin_dashboard_view(request):

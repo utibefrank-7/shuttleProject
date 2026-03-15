@@ -1,24 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner Dashboard </title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Dashboard</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f4f6f8;
+    margin:40px;
+}
+
+table{
+    width:100%;
+    background:white;
+    border-collapse:collapse;
+    margin-bottom:30px;
+}
+
+th, td{
+    padding:12px;
+    border:1px solid #ddd;
+    text-align:left;
+}
+
+th{
+    background:#007bff;
+    color:white;
+}
+
+.pending{
+    color:orange;
+    font-weight:bold;
+}
+
+.approved{
+    color:green;
+    font-weight:bold;
+}
+
+.rejected{
+    color:red;
+    font-weight:bold;
+}
+
+a.button{
+    display:inline-block;
+    margin-bottom:20px;
+    background:#007bff;
+    color:white;
+    padding:10px 15px;
+    text-decoration:none;
+    border-radius:5px;
+}
+
+.profile-btn{
+    background:green;
+    color:white;
+    padding:6px 10px;
+    text-decoration:none;
+    border-radius:4px;
+}
+</style>
 </head>
+
 <body>
-    <h2>Owner's Dashboard</h2>
-     <p>welcome {{request.user.username}} {{request.user.role}}</p>
 
-    <form method="post" action="{% url 'logout' %}">
+<h2>Owner's Dashboard</h2>
+
+<p>Welcome {{ request.user.username }} ({{ request.user.role }})</p>
+
+<form method="post" action="{% url 'logout' %}">
     {% csrf_token %}
-
-    <button type="submit">
-
-        Logout
-
-    </button>
-
+    <button type="submit">Logout</button>
 </form>
-    
+
+<a class="button" href="{% url 'register_bus' %}">Register New Vehicle</a>
+
+
+<!-- Pending Buses -->
+<h3>Pending Vehicles</h3>
+
+<table>
+<tr>
+    <th>Vehicle Name</th>
+    <th>Plate No</th>
+    <th>Colour</th>
+    <th>Capacity</th>
+    <th>Status</th>
+</tr>
+
+{% for bus in buses %}
+{% if bus.status == "pending" %}
+
+<tr>
+    <td>{{ bus.vehicle_name }}</td>
+    <td>{{ bus.plate_no }}</td>
+    <td>{{ bus.colour }}</td>
+    <td>{{ bus.capacity }}</td>
+    <td><span class="pending">Pending Approval</span></td>
+</tr>
+
+{% endif %}
+{% empty %}
+<tr>
+<td colspan="5">No pending vehicles.</td>
+</tr>
+{% endfor %}
+
+</table>
+
+
+
+<!-- Approved Buses -->
+<h3>Approved Vehicles</h3>
+
+<table>
+
+<tr>
+<th>Vehicle Name</th>
+<th>Plate No</th>
+<th>Colour</th>
+<th>Capacity</th>
+<th>Assigned Driver</th>
+<th>Status</th>
+</tr>
+
+{% for bus in buses %}
+{% if bus.status == "approved" %}
+
+<tr>
+
+<td>{{ bus.vehicle_name }}</td>
+
+<td>{{ bus.plate_no }}</td>
+
+<td>{{ bus.colour }}</td>
+
+<td>{{ bus.capacity }}</td>
+
+<td>
+{% if bus.driver %}
+{{ bus.driver.user.username }}
+{% else %}
+No Driver Assigned
+{% endif %}
+</td>
+
+
+<td><span class="approved">Approved</span></td>
+
+</tr>
+
+{% endif %}
+{% empty %}
+<tr>
+<td colspan="7">No approved vehicles.</td>
+</tr>
+{% endfor %}
+
+</table>
+
+
+
+<!-- Rejected Buses -->
+<h3>Rejected Vehicles</h3>
+
+<table>
+
+<tr>
+<th>Vehicle Name</th>
+<th>Plate No</th>
+<th>Colour</th>
+<th>Capacity</th>
+<th>Status</th>
+</tr>
+
+{% for bus in buses %}
+{% if bus.status == "rejected" %}
+
+<tr>
+<td>{{ bus.vehicle_name }}</td>
+<td>{{ bus.plate_no }}</td>
+<td>{{ bus.colour }}</td>
+<td>{{ bus.capacity }}</td>
+<td><span class="rejected">Rejected</span></td>
+</tr>
+
+{% endif %}
+{% empty %}
+<tr>
+<td colspan="5">No rejected vehicles.</td>
+</tr>
+{% endfor %}
+
+</table>
+
 </body>
 </html>
