@@ -137,7 +137,10 @@ def driver_profile_update_view(request):
 
         request,
         "accounts/driver_profile_update.html",{"form":form}
-    )    
+    )  
+
+
+  
     
 @login_required
 def driver_application_view(request):
@@ -247,26 +250,50 @@ def register_bus_view(request):
 
 
 
-        
    
 @login_required
+@role_required(allowed_roles=["admin"])#middleware protection 
 def admin_dashboard_view(request):
     if request.user.role !="admin":
         return HttpResponseForbidden("you're forbidden to use this Url ")
     
-    applications = DriverApplication.objects.all()
-    buses  =Bus.objects.all()
-    drivers =Driverprofile.objects.all()
+    # applications = DriverApplication.objects.all()
+    # buses  =Bus.objects.all()
+    # drivers =Driverprofile.objects.all()
+    total_drivers = Driverprofile.objects.count()
+    pending_applications =DriverApplication.objects.filter(status="pending").count()
+    total_buses =Bus.objects.count()
+    approved_buses =Bus.objects.filter(status="approved").count()
+    rejected_buses =Bus.objects.filter(status="reject").count()
 
     context ={
-        "applications":applications,
-        "buses":buses,
-        "drivers":drivers
+        # "applications":applications,
+        # "buses":buses,
+        # "drivers":drivers,
+        "total_drivers":total_drivers,
+        "pending_applications":pending_applications,
+        "total_buses":total_buses,
+        "approved_buses":approved_buses,
+        "rejected_buses":rejected_buses,
     }
     return render(
         request, "accounts/admin_dashboard.html",
         context
     )
+
+def admin_driver_applications_view(request):
+    applications = DriverApplication.objects.all()
+    context={
+        "applications":applications
+
+    }   
+    return render(request, "accounts/admin_driver_applications.html", context)   
+def admin_bus_management_view(request):
+    buses=Bus.objects.all()
+    context={
+        "buses":buses
+    }  
+    return render(request, "accounts/admin_bus_management.html", context)
 @login_required
 def approve_bus_view(request, id):
     if request.user.role !="admin":
@@ -336,12 +363,13 @@ def assign_driver_view(request, bus_id):
 
 
 
+
+
+
+
 def logout_view(request):
 
     logout(request)
 
     return redirect("login")
 
-# @login_required
-# def admin_dashboard_view(request):
-#     return render()

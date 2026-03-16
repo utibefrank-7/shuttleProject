@@ -1,212 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Admin Dashboard</title>
-
-<style>
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-bottom:30px;
-}
-
-th,td{
-    border:1px solid #333;
-    padding:8px;
-    text-align:left;
-}
-
-th{
-    background:#f2f2f2;
-}
-
-form{
-    display:inline;
-}
-
-button{
-    padding:5px 10px;
-    margin:2px;
-    cursor:pointer;
-}
-
-select{
-    padding:5px;
-}
-
-h1,h3{
-    margin-bottom:10px;
-}
-</style>
-
-</head>
-
-<body>
-
-<!-- LOGOUT -->
-<form method="post" action="{% url 'logout' %}">
-{% csrf_token %}
-<button type="submit">Logout</button>
-</form>
-
-<h1>Admin Dashboard</h1>
-
-<!-- DRIVER APPLICATIONS -->
-<h3>Driver Applications</h3>
-
-<table>
-
-<tr>
-<th>Driver</th>
-<th>Experience</th>
-<th>Reason</th>
-<th>Status</th>
-<th>Action</th>
-</tr>
-
-{% for application in applications %}
-
-<tr>
-
-<td>{{ application.driver.username }}</td>
-
-<td>{{ application.experience_years }}</td>
-
-<td>{{ application.reason }}</td>
-
-<td>{{ application.status }}</td>
-
-<td>
-
-{% if application.status == "pending" %}
-
-<form method="POST" action="{% url 'approve_application' application.id %}">
-{% csrf_token %}
-<button type="submit">Approve</button>
-</form>
-
-<form method="POST" action="{% url 'reject_application' application.id %}">
-{% csrf_token %}
-<button type="submit">Reject</button>
-</form>
-
-{% else %}
-
-No Action Needed
-
-{% endif %}
-
-</td>
-
-</tr>
-
-{% empty %}
-
-<tr>
-<td colspan="5">No Applications Yet</td>
-</tr>
-
-{% endfor %}
-
-</table>
-
-<!-- BUSES -->
-<h3>Buses</h3>
-
-<table>
-
-<tr>
-<th>Vehicle Name</th>
-<th>Plate Number</th>
-<th>Driver</th>
-<th>Capacity</th>
-<th>Status</th>
-<th>Assign Driver</th>
-<th>Action</th>
-</tr>
-
-{% for bus in buses %}
-
-<tr>
-
-<td>{{ bus.vehicle_name }}</td>
-
-<td>{{ bus.plate_no }}</td>
-
-<td>
-{% if bus.driver %}
-{{ bus.driver.user.username }}
-{% else %}
-No Driver Assigned
-{% endif %}
-</td>
-
-<td>{{ bus.capacity }}</td>
-
-<td>{{ bus.status }}</td>
-
-<!-- DRIVER DROPDOWN -->
-<td>
-
-<form method="POST" action="{% url 'assign_driver' bus.id %}">
-
-{% csrf_token %}
-
-<select name="driver_id">
-
-<option value="">Select Driver</option>
-
-{% for driver in drivers %}
-
-<option value="{{ driver.id }}">
-{{ driver.user.username }}
-</option>
-
-{% endfor %} 
-
-</select>
-
-<button type="submit">Assign</button>
-
-</form>
-
-</td>
-
-<!-- APPROVE / REJECT BUS -->
-<td>
-
-{% if bus.status == "pending" %}
-
-<form method="POST" action="{% url 'approve_bus' bus.id %}">
-{% csrf_token %}
-<button type="submit">Approve</button>
-</form>
-
-<form method="POST" action="{% url 'reject_bus' bus.id %}">
-{% csrf_token %}
-<button type="submit">Reject</button>
-</form>
-
-{% else %}
-
-No Action Needed
-
-{% endif %}
-
-</td>
-
-</tr>
-
-{% empty %}
-
-<tr>
-<td colspan="7">No Buses Yet</td>
-</tr>
-
-{% endfor %}
-
-</table>
-
-</body>
-</html>
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+
+<h1 class="text-3xl font-bold mb-8">
+Admin Dashboard
+</h1>
+
+<div class="grid grid-cols-4 gap-6 mb-10">
+
+<div class="bg-white shadow rounded-lg p-6">
+<h3 class="text-gray-500">Total Drivers</h3>
+<p class="text-3xl font-bold text-blue-600">
+{{ total_drivers }}
+</p>
+</div>
+
+<div class="bg-white shadow rounded-lg p-6">
+<h3 class="text-gray-500">Pending Applications</h3>
+<p class="text-3xl font-bold text-yellow-500">
+{{ pending_applications }}
+</p>
+</div>
+
+<div class="bg-white shadow rounded-lg p-6">
+<h3 class="text-gray-500">Total Buses</h3>
+<p class="text-3xl font-bold text-purple-600">
+{{ total_buses }}
+</p>
+</div>
+
+<div class="bg-white shadow rounded-lg p-6">
+<h3 class="text-gray-500">Approved Buses</h3>
+<p class="text-3xl font-bold text-green-600">
+{{ approved_buses }}
+</p>
+</div>
+
+<div class="bg-white shadow rounded-lg p-6">
+<h3 class="text-gray-500">Rejected Buses</h3>
+<p class="text-3xl font-bold text-red-700">
+{{ rejected_buses }}
+</p>
+</div>
+
+</div>
+
+{% endblock %}

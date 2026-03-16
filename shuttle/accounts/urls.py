@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import signup_view, home_view, login_view, logout_view, driver_dashboard_view, owner_dashboard_view, driver_profile_view, driver_profile_update_view, driver_application_view, admin_dashboard_view,  register_bus_view,approve_bus_view, reject_bus_view, approve_application_view,reject_application_view, assign_driver_view, about_view, feartures_view
+from .views import signup_view, home_view, login_view, logout_view, driver_dashboard_view, owner_dashboard_view, driver_profile_view, driver_profile_update_view, driver_application_view, admin_dashboard_view,  register_bus_view,approve_bus_view, reject_bus_view, approve_application_view,reject_application_view, assign_driver_view, about_view, feartures_view, admin_driver_applications_view, admin_bus_management_view
 
 urlpatterns=[
     path('', home_view, name='home'),
@@ -19,6 +19,9 @@ urlpatterns=[
    
 
      path('admin_dashboard/', admin_dashboard_view, name="admin_dashboard"),
+     path('admin_driver/applications', admin_driver_applications_view, name="admin_driver_applications"),
+
+     path('admin_bus/management', admin_bus_management_view, name="bus_management"),
      path('bus/<int:id>/approve', approve_bus_view, name="approve_bus"),
      path('bus/<int:id>/reject', reject_bus_view, name="reject_bus"),
 
