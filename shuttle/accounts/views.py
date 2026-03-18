@@ -194,6 +194,15 @@ def driver_application_view(request):
         {"form": form}
     )
 
+# rendering bus assigned to a particular driver
+def driver_assigned_bus_view(request):
+    driver = Driverprofile.objects.get(user=request.user)
+    bus = Bus.objects.filter(driver=driver).first()
+
+    return render(request, "accounts/driver_assigned_bus.html", {
+        'bus':bus
+    })
+
 @login_required
 @role_required(allowed_roles=["owner"]) #middleware protection
 def owner_dashboard_view(request):
@@ -268,7 +277,9 @@ def admin_driver_applications_view(request):
         "applications":applications
 
     }   
-    return render(request, "accounts/admin_driver_applications.html", context)   
+    return render(request, "accounts/admin_driver_applications.html", context)  
+
+    # search function  
 def admin_bus_management_view(request):
     buses=Bus.objects.all()
     query = request.GET.get("q")
