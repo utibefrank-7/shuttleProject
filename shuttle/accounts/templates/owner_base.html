@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Owner Panel</title>
+
+{% load static tailwind_tags %}
+{% tailwind_css %}
+
+</head>
+
+<body class="bg-gray-100">
+
+<div class="flex min-h-screen">
+
+<!-- SIDEBAR -->
+<div class="w-64 bg-gray-900 text-white flex flex-col">
+
+<div class="p-6 text-2xl font-bold border-b border-gray-700">
+Owner Panel
+</div>
+
+<nav class="flex-1 p-4 space-y-2">
+
+<a href="{% url 'owner_dashboard' %}" class="block px-4 py-2 rounded hover:bg-gray-700">
+Dashboard
+</a>
+
+<a href="{% url 'register_bus' %}" class="block px-4 py-2 rounded hover:bg-gray-700">
+Add Bus
+</a>
+
+</nav>
+
+<div class="p-4 border-t border-gray-700">
+
+<form method="post" action="{% url 'logout' %}">
+{% csrf_token %}
+<button class="w-full bg-red-500 py-2 rounded hover:bg-red-600">
+Logout
+</button>
+</form>
+
+</div>
+
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="flex-1 p-10">
+
+{% block owner_content %}
+{% endblock %}
+
+</div>
+
+</div>
+
+</body>
+</html>

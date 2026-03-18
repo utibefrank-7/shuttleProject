@@ -100,6 +100,7 @@ class Bus(models.Model):
     plate_no =models.CharField(max_length=100, null=True)
     colour = models.CharField(max_length=100)
     capacity = models.CharField(max_length=100)
+    image = models.ImageField(upload_to="bus_images/", blank=True, null=True)
     status=models.CharField(max_length=200, choices=STATUS_CHOICES, default="pending")
 
     created_at =models.DateTimeField(auto_now_add=True)

@@ -100,7 +100,35 @@ class BusForm(forms.ModelForm):
             "plate_no",
             "colour",
             "capacity",
+            "image",
         )
+
+    widgets = {
+            "vehicle_name": forms.TextInput(attrs={
+                "class": "w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500",
+                "placeholder": "Enter vehicle name"
+            }),
+
+            "plate_no": forms.TextInput(attrs={
+                "class": "w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500",
+                "placeholder": "Enter plate number"
+            }),
+
+            "colour": forms.TextInput(attrs={
+                "class": "w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500",
+                "placeholder": "Enter vehicle colour"
+            }),
+
+            "capacity": forms.NumberInput(attrs={
+                "class": "w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500",
+                "placeholder": "Enter capacity"
+            }),
+
+            "image": forms.ClearableFileInput(attrs={
+                "class": "w-full border rounded-lg p-3 bg-white"
+            }),
+        }
+        
 class LoginForm(AuthenticationForm):
    username = forms.CharField(
         widget=forms.TextInput(attrs={

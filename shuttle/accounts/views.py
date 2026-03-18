@@ -9,6 +9,7 @@ from .models import Driverprofile, DriverApplication,Bus
 from .forms import DriverprofileForm, DriverApplicationForm,BusForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 
 
@@ -153,7 +154,7 @@ def driver_application_view(request):
             "Only Drivers can Apply. You are not signed up as a Driver."
         )
 
-    # Prevent multiple pending applications
+    # Prevent multiple pending applications from one driver 
     active_application = DriverApplication.objects.filter(
         driver=user,
         status="pending"
@@ -213,7 +214,7 @@ def register_bus_view(request):
         return HttpResponseForbidden()
     
     if request.method =="POST":
-        form =BusForm(request.POST)
+        form =BusForm(request.POST, request.FILES)
 
         if form.is_valid():
             bus = form.save(commit=False)
@@ -236,30 +237,13 @@ def register_bus_view(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
+ 
 @login_required
 @role_required(allowed_roles=["admin"])#middleware protection 
 def admin_dashboard_view(request):
     if request.user.role !="admin":
         return HttpResponseForbidden("you're forbidden to use this Url ")
-    
-    # applications = DriverApplication.objects.all()
-    # buses  =Bus.objects.all()
-    # drivers =Driverprofile.objects.all()
+   
     total_drivers = Driverprofile.objects.count()
     pending_applications =DriverApplication.objects.filter(status="pending").count()
     total_buses =Bus.objects.count()
@@ -267,9 +251,6 @@ def admin_dashboard_view(request):
     rejected_buses =Bus.objects.filter(status="reject").count()
 
     context ={
-        # "applications":applications,
-        # "buses":buses,
-        # "drivers":drivers,
         "total_drivers":total_drivers,
         "pending_applications":pending_applications,
         "total_buses":total_buses,
@@ -290,8 +271,22 @@ def admin_driver_applications_view(request):
     return render(request, "accounts/admin_driver_applications.html", context)   
 def admin_bus_management_view(request):
     buses=Bus.objects.all()
+    query = request.GET.get("q")
+    if query:
+        buses = buses.filter(
+            Q(vehicle_name__icontains=query)|
+            Q(plate_no__icontains=query)|
+            Q(driver__user__username__icontains=query)
+            
+        )
+    drivers =Driverprofile.objects.all()
+    status =request.GET.get("status")
+    if status:
+        buses =buses.filter(status=status)
+
     context={
-        "buses":buses
+        "buses":buses,
+        "drivers":drivers,
     }  
     return render(request, "accounts/admin_bus_management.html", context)
 @login_required
@@ -360,6 +355,11 @@ def assign_driver_view(request, bus_id):
          bus.save()
 
    return redirect("admin_dashboard")
+
+def delete_bus_view(request, bus_id):
+    bus =Bus.objects.get(id=bus_id)
+    bus.delete()
+    return redirect("bus_management")
 
 
 

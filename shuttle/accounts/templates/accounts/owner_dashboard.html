@@ -1,201 +1,152 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Owner Dashboard</title>
+{% extends "owner_base.html" %}
 
-<style>
-body{
-    font-family: Arial;
-    background:#f4f6f8;
-    margin:40px;
-}
+{% block owner_content %}
 
-table{
-    width:100%;
-    background:white;
-    border-collapse:collapse;
-    margin-bottom:30px;
-}
+<!-- HEADER -->
+<div class="flex justify-between items-center mb-8">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Owner Dashboard</h1>
+        <p class="text-gray-500">Welcome {{ request.user.username }}</p>
+    </div>
 
-th, td{
-    padding:12px;
-    border:1px solid #ddd;
-    text-align:left;
-}
+    <a href="{% url 'register_bus' %}" 
+       class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
+        + Register Vehicle
+    </a>
+</div>
 
-th{
-    background:#007bff;
-    color:white;
-}
+<!-- STATS -->
+<div class="grid grid-cols-3 gap-6 mb-10">
 
-.pending{
-    color:orange;
-    font-weight:bold;
-}
+    <div class="bg-white p-6 rounded-xl shadow">
+        <p class="text-gray-500">Pending</p>
+        <h2 class="text-3xl font-bold text-yellow-500">
+            {{ pending_count }}
+        </h2>
+    </div>
 
-.approved{
-    color:green;
-    font-weight:bold;
-}
+    <div class="bg-white p-6 rounded-xl shadow">
+        <p class="text-gray-500">Approved</p>
+        <h2 class="text-3xl font-bold text-green-600">
+            {{ approved_count }}
+        </h2>
+    </div>
 
-.rejected{
-    color:red;
-    font-weight:bold;
-}
+    <div class="bg-white p-6 rounded-xl shadow">
+        <p class="text-gray-500">Rejected</p>
+        <h2 class="text-3xl font-bold text-red-600">
+            {{ rejected_count }}
+        </h2>
+    </div>
 
-a.button{
-    display:inline-block;
-    margin-bottom:20px;
-    background:#007bff;
-    color:white;
-    padding:10px 15px;
-    text-decoration:none;
-    border-radius:5px;
-}
+</div>
 
-.profile-btn{
-    background:green;
-    color:white;
-    padding:6px 10px;
-    text-decoration:none;
-    border-radius:4px;
-}
-</style>
-</head>
+<!-- ================= PENDING ================= -->
+<div class="mb-10">
+    <h2 class="text-xl font-semibold mb-4 text-yellow-600">
+        Pending Vehicles
+    </h2>
 
-<body>
+    <div class="grid grid-cols-3 gap-6">
 
-<h2>Owner's Dashboard</h2>
+        {% for bus in buses %}
+        {% if bus.status == "pending" %}
 
-<p>Welcome {{ request.user.username }} ({{ request.user.role }})</p>
+        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-yellow-400">
 
-<form method="post" action="{% url 'logout' %}">
-    {% csrf_token %}
-    <button type="submit">Logout</button>
-</form>
+            <h3 class="text-lg font-bold">{{ bus.vehicle_name }}</h3>
+            <p class="text-gray-500">{{ bus.plate_no }}</p>
 
-<a class="button" href="{% url 'register_bus' %}">Register New Vehicle</a>
+            <p class="mt-2 text-sm">Capacity: {{ bus.capacity }}</p>
+            <p class="text-sm">Colour: {{ bus.colour }}</p>
 
+            <span class="inline-block mt-3 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
+                Pending Approval
+            </span>
 
-<!-- Pending Buses -->
-<h3>Pending Vehicles</h3>
+        </div>
 
-<table>
-<tr>
-    <th>Vehicle Name</th>
-    <th>Plate No</th>
-    <th>Colour</th>
-    <th>Capacity</th>
-    <th>Status</th>
-</tr>
+        {% endif %}
+        {% empty %}
+        <p class="text-gray-500">No pending vehicles</p>
+        {% endfor %}
 
-{% for bus in buses %}
-{% if bus.status == "pending" %}
+    </div>
+</div>
 
-<tr>
-    <td>{{ bus.vehicle_name }}</td>
-    <td>{{ bus.plate_no }}</td>
-    <td>{{ bus.colour }}</td>
-    <td>{{ bus.capacity }}</td>
-    <td><span class="pending">Pending Approval</span></td>
-</tr>
+<!-- ================= APPROVED ================= -->
+<div class="mb-10">
+    <h2 class="text-xl font-semibold mb-4 text-green-600">
+        Approved Vehicles
+    </h2>
 
-{% endif %}
-{% empty %}
-<tr>
-<td colspan="5">No pending vehicles.</td>
-</tr>
-{% endfor %}
+    <div class="grid grid-cols-3 gap-6">
 
-</table>
+        {% for bus in buses %}
+        {% if bus.status == "approved" %}
 
+        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-green-500">
 
+            <h3 class="text-lg font-bold">{{ bus.vehicle_name }}</h3>
+            <p class="text-gray-500">{{ bus.plate_no }}</p>
 
-<!-- Approved Buses -->
-<h3>Approved Vehicles</h3>
+            <p class="mt-2 text-sm">Capacity: {{ bus.capacity }}</p>
+            <p class="text-sm">Colour: {{ bus.colour }}</p>
 
-<table>
+            <p class="text-sm mt-2">
+                Driver:
+                {% if bus.driver %}
+                    <span class="font-semibold">{{ bus.driver.user.username }}</span>
+                {% else %}
+                    <span class="text-gray-400">Not Assigned</span>
+                {% endif %}
+            </p>
 
-<tr>
-<th>Vehicle Name</th>
-<th>Plate No</th>
-<th>Colour</th>
-<th>Capacity</th>
-<th>Assigned Driver</th>
-<th>Status</th>
-</tr>
+            <span class="inline-block mt-3 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                Approved
+            </span>
 
-{% for bus in buses %}
-{% if bus.status == "approved" %}
+        </div>
 
-<tr>
+        {% endif %}
+        {% empty %}
+        <p class="text-gray-500">No approved vehicles</p>
+        {% endfor %}
 
-<td>{{ bus.vehicle_name }}</td>
+    </div>
+</div>
 
-<td>{{ bus.plate_no }}</td>
+<!-- ================= REJECTED ================= -->
+<div class="mb-10">
+    <h2 class="text-xl font-semibold mb-4 text-red-600">
+        Rejected Vehicles
+    </h2>
 
-<td>{{ bus.colour }}</td>
+    <div class="grid grid-cols-3 gap-6">
 
-<td>{{ bus.capacity }}</td>
+        {% for bus in buses %}
+        {% if bus.status == "rejected" %}
 
-<td>
-{% if bus.driver %}
-{{ bus.driver.user.username }}
-{% else %}
-No Driver Assigned
-{% endif %}
-</td>
+        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-red-500">
 
+            <h3 class="text-lg font-bold">{{ bus.vehicle_name }}</h3>
+            <p class="text-gray-500">{{ bus.plate_no }}</p>
 
-<td><span class="approved">Approved</span></td>
+            <p class="mt-2 text-sm">Capacity: {{ bus.capacity }}</p>
+            <p class="text-sm">Colour: {{ bus.colour }}</p>
 
-</tr>
+            <span class="inline-block mt-3 bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">
+                Rejected
+            </span>
 
-{% endif %}
-{% empty %}
-<tr>
-<td colspan="7">No approved vehicles.</td>
-</tr>
-{% endfor %}
+        </div>
 
-</table>
+        {% endif %}
+        {% empty %}
+        <p class="text-gray-500">No rejected vehicles</p>
+        {% endfor %}
 
+    </div>
+</div>
 
-
-<!-- Rejected Buses -->
-<h3>Rejected Vehicles</h3>
-
-<table>
-
-<tr>
-<th>Vehicle Name</th>
-<th>Plate No</th>
-<th>Colour</th>
-<th>Capacity</th>
-<th>Status</th>
-</tr>
-
-{% for bus in buses %}
-{% if bus.status == "rejected" %}
-
-<tr>
-<td>{{ bus.vehicle_name }}</td>
-<td>{{ bus.plate_no }}</td>
-<td>{{ bus.colour }}</td>
-<td>{{ bus.capacity }}</td>
-<td><span class="rejected">Rejected</span></td>
-</tr>
-
-{% endif %}
-{% empty %}
-<tr>
-<td colspan="5">No rejected vehicles.</td>
-</tr>
-{% endfor %}
-
-</table>
-
-</body>
-</html>
+{% endblock %}
