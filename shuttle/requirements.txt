@@ -51,18 +51,18 @@ click
 cloudpickle 
 colorama 
 colorcet 
-conda 
-conda-anaconda-telemetry 
-conda-anaconda-tos 
-conda-build 
-conda-content-trust 
-conda-libmamba-solver    
-conda-pack
-conda-package-handling 
-conda-repo-cli 
-conda-token 
-conda_index 
-conda_package_streaming   
+# conda 
+# conda-anaconda-telemetry 
+# conda-anaconda-tos 
+# conda-build 
+# conda-content-trust 
+# conda-libmamba-solver    
+# conda-pack
+# conda-package-handling 
+# conda-repo-cli 
+# conda-token 
+# conda_index 
+# conda_package_streaming   
 constantly 
 contourpy 
 cookiecutter 
@@ -82,7 +82,7 @@ dill
 distributed 
 distro 
 dj-database-url==3.1.2
-Django==5.2.5
+# Django==5.2.5
 django-csp==4.0
 django-extensions==4.1
 django-filter==25.1
@@ -106,7 +106,7 @@ gitdb
 GitPython 
 gmpy2 
 greenlet 
-gunicorn==25.1.0
+# gunicorn==25.1.0
 h11 
 h5py 
 HeapDict 
@@ -221,7 +221,7 @@ pathspec
 patsy
 pexpect
 pickleshare
-pillow
+# pillow
 pkce
 pkginfo
 platformdirs
@@ -235,7 +235,7 @@ propcache
 Protego
 protobuf
 psutil
-psycopg2-binary==2.9.11
+# psycopg2-binary==2.9.11
 ptyprocess 
 pure-eval 
 py-cpuinfo 
