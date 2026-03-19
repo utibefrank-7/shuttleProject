@@ -237,7 +237,31 @@ def register_bus_view(request):
     return render(request, "accounts/register_bus.html", {"form":form}
     )
 
+def update_bus_view(request,bus_id):
+    bus= Bus.objects.get(id=bus_id, owner=request.user)
+    #ensures owner can edit their own bus
+    if request.method=="POST":
+        form =BusForm(
+           request.POST,
+           request.FILES,
+           instance=bus
+)
+        if form.is_valid():
+            form.save()
+            return redirect('owner_dashboard')
+        
 
+    else:
+        form =BusForm(instance=bus)
+
+    return render(  request, "accounts/update_bus.html",{ 
+      
+            'form':form,
+            'bus':bus
+    })
+           
+        
+    
 
 
 
