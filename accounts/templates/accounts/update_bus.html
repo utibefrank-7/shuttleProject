@@ -1,0 +1,47 @@
+{% extends "owner_base.html" %}
+
+{% block owner_content %}
+
+<div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
+
+    <h2 class="text-xl font-bold mb-4">Update Bus</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        <div class="mb-4">
+            <label class="block text-gray-700">Vehicle Name</label>
+            {{ form.vehicle_name }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700">Plate Number</label>
+            {{ form.plate_no }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700">Colour</label>
+            {{ form.colour }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700">Capacity</label>
+            {{ form.capacity }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700">Image</label>
+            {{ form.image }}
+        </div>
+
+        <button class="bg-blue-600 text-white px-4 py-2 rounded">
+            Update Bus
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

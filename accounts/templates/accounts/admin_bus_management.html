@@ -1,0 +1,154 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+
+<h3 class="text-xl font-semibold mb-4">
+Bus Management
+</h3>
+
+<form method="GET" class="mb-4 flex gap-2">
+
+<input 
+type="text" 
+name="q" 
+placeholder="Search by vehicle, plate, driver or status..." 
+value="{{ request.GET.q }}"
+class="border p-2 rounded w-64"
+/>
+
+<button class="bg-blue-500 text-white px-4 py-2 rounded">
+Search
+</button>
+
+<a href="{% url 'bus_management' %}" class="bg-gray-400 text-white px-4 py-2 rounded">
+Reset
+</a>
+
+</form>
+
+<div class="bg-white shadow rounded-lg p-6 overflow-x-auto">
+
+<table class="w-full border border-gray-200">
+
+<thead class="bg-gray-200">
+<tr>
+<th class="p-3 text-left">Vehicle</th>
+<th class="p-3 text-left">Plate</th>
+<th class="p-3 text-left">Driver</th>
+<th class="p-3 text-center">Capacity</th>
+<th class="p-3 text-center">Status</th>
+<th class="p-3 text-center">Assign Driver</th>
+<th class="p-3 text-center">Action</th>
+<th class="p-3 text-center">Delete</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for bus in buses %}
+
+<tr class="border-t">
+
+<td class="p-3">{{ bus.vehicle_name }}</td>
+<td class="p-3">{{ bus.plate_no }}</td>
+
+<td class="p-3">
+{% if bus.driver %}
+{{ bus.driver.user.username }}
+{% else %}
+<span class="text-gray-500">No Driver Assigned</span>
+{% endif %}
+</td>
+
+<td class="p-3 text-center">{{ bus.capacity }}</td>
+
+<td class="p-3 text-center">
+<span class="px-2 py-1 rounded text-white
+{% if bus.status == 'approved' %} bg-green-500
+{% elif bus.status == 'pending' %} bg-yellow-500
+{% else %} bg-red-500
+{% endif %}
+">
+{{ bus.status }}
+</span>
+</td>
+
+<td class="p-3">
+
+<form method="POST" action="{% url 'assign_driver' bus.id %}" class="flex gap-2 justify-center">
+
+{% csrf_token %}
+
+<select name="driver_id" class="border p-1 rounded text-sm">
+<option value="">Select Driver</option>
+
+{% for driver in drivers %}
+<option value="{{ driver.id }}">
+{{ driver.user.username }}
+</option>
+{% endfor %}
+
+</select>
+
+<button class="bg-blue-500 text-white px-3 py-1 rounded text-sm">
+Assign
+</button>
+
+</form>
+
+</td>
+
+<td class="p-3 text-center">
+
+{% if bus.status == "pending" %}
+
+<form method="POST" action="{% url 'approve_bus' bus.id %}" class="inline">
+{% csrf_token %}
+<button class="bg-green-500 text-white px-3 py-1 rounded text-sm">
+Approve
+</button>
+</form>
+
+<form method="POST" action="{% url 'reject_bus' bus.id %}" class="inline">
+{% csrf_token %}
+<button class="bg-red-500 text-white px-3 py-1 rounded text-sm">
+Reject
+</button>
+</form>
+
+{% else %}
+<span class="text-gray-500 text-sm">No Action</span>
+{% endif %}
+
+</td>
+
+<td class="p-3 text-center">
+
+<form method="POST" action="{% url 'delete_bus' bus.id %}">
+{% csrf_token %}
+<button class="bg-red-600 text-white px-3 py-1 rounded text-sm">
+Delete
+</button>
+</form>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="8" class="p-4 text-center text-gray-500">
+No Buses Yet
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

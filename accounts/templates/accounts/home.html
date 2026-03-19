@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Home | Smart Shuttle{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-10 items-center">
+  <div>
+    <h1 class="text-5xl font-bold text-gray-800 leading-tight">
+      Smart Shuttle Transportation System
+    </h1>
+    <p class="mt-6 text-gray-600 text-lg">
+      A modern platform connecting passengers, drivers and bus owners
+      for safe and efficient shuttle transportation.
+    </p>
+    <div class="mt-8 space-x-4">
+      <a href="{% url 'signup' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-700">
+        Get Started
+      </a>
+      <a href="#features" class="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg text-lg hover:bg-blue-50">
+        Learn More
+      </a>
+    </div>
+  </div>
+  <div>
+    <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957" class="rounded-xl shadow-lg">
+  </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section id="features" class="bg-white py-20">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="text-3xl font-bold text-center text-gray-800">Platform Features</h2>
+    <p class="text-center text-gray-500 mt-3">Everything you need to manage shuttle transportation.</p>
+    <div class="grid md:grid-cols-3 gap-10 mt-12">
+      <div class="bg-gray-50 p-8 rounded-xl shadow hover:shadow-lg">
+        <h3 class="text-xl font-semibold text-blue-600">Bus Registration</h3>
+        <p class="mt-4 text-gray-600">Bus owners can easily register their vehicles and manage their fleet.</p>
+      </div>
+      <div class="bg-gray-50 p-8 rounded-xl shadow hover:shadow-lg">
+        <h3 class="text-xl font-semibold text-blue-600">Driver Assignment</h3>
+        <p class="mt-4 text-gray-600">Admins assign drivers to buses ensuring proper monitoring and control.</p>
+      </div>
+      <div class="bg-gray-50 p-8 rounded-xl shadow hover:shadow-lg">
+        <h3 class="text-xl font-semibold text-blue-600">Trip Management</h3>
+        <p class="mt-4 text-gray-600">Track routes, drivers and bus activities through the dashboard.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

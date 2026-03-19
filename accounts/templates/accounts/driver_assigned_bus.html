@@ -1,0 +1,63 @@
+{% extends "driver_base.html" %}
+
+{% block driver_content %}
+
+<div class="p-6">
+
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">
+        My Assigned Bus
+    </h1>
+
+    {% if bus %}
+
+    <div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+
+        <!-- Bus Image -->
+{% if bus.image %}
+    <img src="{{ bus.image.url }}" class="w-full h-48 object-cover">
+{% else %}
+    <img src="https://via.placeholder.com/400x200?text=No+Image"
+         class="w-full h-48 object-cover">
+{% endif %}
+
+        <!-- Bus Details -->
+        <div class="p-5">
+
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">
+                {{ bus.vehicle_name }}
+            </h2>
+
+            <p class="text-gray-600 mb-1">
+                <span class="font-medium">Plate No:</span> {{ bus.plate_no }}
+            </p>
+
+            <p class="text-gray-600 mb-1">
+                <span class="font-medium">Color:</span> {{ bus.colour }}
+            </p>
+
+            <p class="text-gray-600 mb-3">
+                <span class="font-medium">Capacity:</span> {{ bus.capacity }} passengers
+            </p>
+
+            <!-- Status Badge -->
+            <span class="inline-block bg-green-100 text-green-700 text-sm px-3 py-1 rounded-full">
+                Assigned
+            </span>
+
+        </div>
+    </div>
+
+    {% else %}
+
+    <!-- No Bus Assigned -->
+    <div class="text-center bg-white p-6 rounded-lg shadow">
+        <p class="text-gray-600 text-lg">
+            🚫 No bus assigned to you yet.
+        </p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

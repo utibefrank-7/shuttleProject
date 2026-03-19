@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="flex min-h-screen bg-gray-50">
+
+  <!-- Sidebar -->
+
+  <aside class="w-64 bg-white shadow-md flex flex-col">
+    <div class="px-6 py-4 border-b">
+      <h2 class="text-2xl font-bold text-blue-600">Driver Panel</h2>
+    </div>
+
+
+<nav class="flex-1 px-4 py-6 space-y-2">
+
+  <a href="{% url 'driver_dashboard' %}" 
+  class="block px-4 py-2 rounded-lg hover:bg-blue-100 
+  {% if request.resolver_match.url_name == 'driver_dashboard' %}
+  bg-blue-100 font-semibold
+  {% endif %}">
+    Dashboard
+  </a>
+
+  <a href="{% url 'driver_profile' %}" 
+  class="block px-4 py-2 rounded-lg hover:bg-blue-100
+  {% if request.resolver_match.url_name == 'driver_profile' %}
+  bg-blue-100 font-semibold
+  {% endif %}">
+    Profile
+  </a>
+
+  <a href="{% url 'driver_application' %}" 
+  class="block px-4 py-2 rounded-lg hover:bg-blue-100
+  {% if request.resolver_match.url_name == 'driver_application' %}
+  bg-blue-100 font-semibold
+  {% endif %}">
+    Apply to Drive
+  </a>
+
+  <a href="{%url 'driver_assigned_bus'%}" class="block px-4 py-2 rounded-lg hover:bg-blue-100">
+    Assigned Bus
+  </a>
+
+  <a href="#" class="block px-4 py-2 rounded-lg hover:bg-blue-100">
+    Trips
+  </a>
+
+  <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit"
+    class="w-full text-left px-4 py-2 rounded-lg hover:bg-red-100 text-red-600 font-semibold">
+      Logout
+    </button>
+  </form>
+
+</nav>
+
+
+  </aside>
+
+  <!-- Page Content -->
+
+  <main class="flex-1 p-8">
+
+
+  {% block driver_content %}
+
+  {% endblock %}
+
+
+  </main>
+
+</div>
+
+{% endblock %}

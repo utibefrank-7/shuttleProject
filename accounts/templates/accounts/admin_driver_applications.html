@@ -1,0 +1,78 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+
+<h3 class="text-xl font-semibold mb-4">
+Driver Applications
+</h3>
+
+<div class="bg-white shadow rounded-lg p-6">
+
+<table class="w-full">
+
+<thead class="bg-gray-200">
+
+<tr>
+<th class="p-3 text-left">Driver</th>
+<th class="p-3 text-left">Experience</th>
+<th class="p-3 text-left">Reason</th>
+<th class="p-3 text-left">Status</th>
+<th class="p-3 text-left">Action</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for application in applications %}
+
+<tr class="border-t">
+
+<td class="p-3">{{ application.driver.username }}</td>
+<td class="p-3">{{ application.experience_years }}</td>
+<td class="p-3">{{ application.reason }}</td>
+<td class="p-3">{{ application.status }}</td>
+
+<td class="p-3">
+
+{% if application.status == "pending" %}
+
+<form method="POST" action="{% url 'approve_application' application.id %}" class="inline">
+{% csrf_token %}
+<button class="bg-green-500 text-white px-3 py-1 rounded">
+Approve
+</button>
+</form>
+
+<form method="POST" action="{% url 'reject_application' application.id %}" class="inline">
+{% csrf_token %}
+<button class="bg-red-500 text-white px-3 py-1 rounded">
+Reject
+</button>
+</form>
+
+{% else %}
+No Action Needed
+{% endif %}
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="5" class="p-3 text-center">
+No Applications Yet
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}
