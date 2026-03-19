@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -90,15 +91,12 @@ WSGI_APPLICATION = "shuttle.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME":  "shuttle",
-        "USER": "root",
-        "PASSWORD": "Wallet",
-        "HOST": "localhost",
-        "PORT": "3306",
-    }
+   
+    'default': dj_database_url.config(
+        default='postgresql://shuttle_db_tpmf_user:sObEVzwF4OwnwgZRy9V3UEDG6prpB448@dpg-d6u5qjdm5p6s73bp5lgg-a.oregon-postgres.render.com/shuttle_db_tpmf'
+    )
 }
+
 
 
 # Password validation
