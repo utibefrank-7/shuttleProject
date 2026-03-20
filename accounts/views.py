@@ -23,6 +23,17 @@ def about_view(request):
 
 def feartures_view(request):
     return render(request, "accounts/features.html" )
+def test_email_view(request):
+    send_mail(
+
+        "Test Email",
+        "your email setup is working",
+        None,
+        ['utibefrank07@gmail.com']
+    )
+    return HttpResponse("Email sent")
+
+
 
 def signup_view(request):
     if request.method =="POST":
@@ -396,17 +407,6 @@ def assign_driver_view(request, bus_id):
 
 
 
-
-
-def test_email_view(request):
-    send_email(
-
-        "Test Email",
-        "your email setup is working",
-        None,
-        ['utibefrank07@gmail.com']
-    )
-    return HttpResponse("Email sent")
 
 
 
