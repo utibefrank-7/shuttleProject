@@ -9,3 +9,4 @@ django-filter==25.1
 django-extensions==3.2.3
 django-taggit==6.1.0
 psycopg2-binary
+gunicorn
