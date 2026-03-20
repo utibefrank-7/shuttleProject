@@ -4,12 +4,13 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .decorators import role_required
 from django.contrib.auth import logout
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from .models import Driverprofile, DriverApplication,Bus
 from .forms import DriverprofileForm, DriverApplicationForm,BusForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.core.mail import send_mail
 
 
 
@@ -22,6 +23,17 @@ def about_view(request):
 
 def feartures_view(request):
     return render(request, "accounts/features.html" )
+def test_email_view(request):
+    send_mail(
+
+        "Test Email",
+        "your email setup is working",
+        None,
+        ['utibefrank07@gmail.com']
+    )
+    return HttpResponse("Email sent")
+
+
 
 def signup_view(request):
     if request.method =="POST":
@@ -390,6 +402,14 @@ def assign_driver_view(request, bus_id):
          bus.save()
 
    return redirect("admin_dashboard")
+
+
+
+
+
+
+
+
 
 def delete_bus_view(request, bus_id):
     bus =Bus.objects.get(id=bus_id)
