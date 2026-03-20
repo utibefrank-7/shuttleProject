@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.core.mail import send_mail
+import socket
 
 
 
@@ -33,7 +34,13 @@ def test_email_view(request):
     )
     return HttpResponse("Email sent")
 
-
+def smtp_test(request):
+    try:
+        s = socket.create_connection(("smtp.gmail.com", 587), timeout=5)
+        s.close()
+        return HttpResponse("Connection to Gmail SMTP OK")
+    except Exception as e:
+        return HttpResponse(f"Failed: {e}")
 
 def signup_view(request):
     if request.method =="POST":
