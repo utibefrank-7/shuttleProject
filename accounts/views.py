@@ -10,7 +10,8 @@ from .forms import DriverprofileForm, DriverApplicationForm,BusForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from django.core.mail import send_mail
+from .gmail_service import send_gmail
+
 
 
 
@@ -23,16 +24,6 @@ def about_view(request):
 
 def feartures_view(request):
     return render(request, "accounts/features.html" )
-def test_email_view(request):
-    send_mail(
-
-        "Test Email",
-        "your email setup is working",
-        None,
-        ['utibefrank07@gmail.com']
-    )
-    return HttpResponse("Email sent")
-
 
 
 def signup_view(request):
@@ -79,6 +70,14 @@ def login_view(request):
         form =LoginForm()
     return render(request,"accounts/login.html", {"form":form})   
  
+
+
+def test_email_view(request):
+    send_gmail('utibefrank07@gmail.com', 'Test Email', "This is a test email from Django!")
+
+    return  HttpResponse("Email sent!")
+    
+
 #@login_required for login protection 
 @login_required
 @role_required(allowed_roles=["driver"])#middleware protection
