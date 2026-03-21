@@ -36,6 +36,6 @@ urlpatterns=[
     path("assign-driver/<int:bus_id>/", assign_driver_view, name="assign_driver"),
 
     path('test-email/', test_email_view, name="test_email"),
-    path('smtp-test/', smtp_test, name="smtp_test")
+    path('smtp-test/', smtp_test, name="test_email")
 
 ]       
