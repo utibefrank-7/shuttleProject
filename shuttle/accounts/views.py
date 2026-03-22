@@ -11,7 +11,12 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from .gmail_service import send_gmail
-
+from .tokens import email_verification_token
+from django.utils.encoding import force_bytes
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth import get_user_model
 
 
 
@@ -39,6 +44,36 @@ def signup_view(request):
         form = SignupForm()
     return render(request, 'accounts/signup.html', {'form':form})
 
+
+def send_verification_email_view(request, user):
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token =email_verification_token.make_token(user)
+
+    verification_link = request.build_absolute_uri(
+        reverse('verify-email', kwargs={'uidb64':uid, 'token':token})
+    )
+
+    send_gmail(
+         user.email,
+    "verify your account",
+    f"click this link to verify your account:\n{verification_link}"
+)
+User=get_user_model()
+def verify_email_view(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user =User.objects.get(pk=uid)
+
+    except:
+        return HttpResponse("invalid link")
+    
+    if email_verification_token.check_token(user, token):
+        user.is_verified =True
+        user.is_active =True
+        user.save()
+        return HttpResponse("Email Verified successfully")
+    else:
+        return HttpResponse("invalid or expired token ")
 def login_view(request):
     if request.method =="POST":
         form = LoginForm(request, data=request.POST)
