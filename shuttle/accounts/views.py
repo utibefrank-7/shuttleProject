@@ -35,7 +35,7 @@ def signup_view(request):
             form = SignupForm(request.POST)
 
             if form.is_valid():
-                user = form.save()
+                user = form.save(commit=False)
 
                 # Ensure user is not verified
                 user.is_verified = False
