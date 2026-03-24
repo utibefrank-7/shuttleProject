@@ -1,39 +1,31 @@
+# gmail_service.py
 import os
-import json
-import base64
-from email.mime.text import MIMEText
-from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
 
+GMAIL_CLIENT_ID = os.environ.get("GMAIL_CLIENT_ID")
+GMAIL_CLIENT_SECRET = os.environ.get("GMAIL_CLIENT_SECRET")
+GMAIL_REFRESH_TOKEN = os.environ.get("GMAIL_REFRESH_TOKEN")
+GMAIL_EMAIL = os.environ.get("GMAIL_EMAIL")
 
-def get_gmail_credentials():
-    token_json = os.environ.get("GOOGLE_TOKEN")
+creds = Credentials(
+    None,
+    refresh_token=GMAIL_REFRESH_TOKEN,
+    client_id=GMAIL_CLIENT_ID,
+    client_secret=GMAIL_CLIENT_SECRET,
+    token_uri="https://oauth2.googleapis.com/token"
+)
 
-    if not token_json:
-        raise Exception("GOOGLE_TOKEN not found in environment variables")
+service = build('gmail', 'v1', credentials=creds)
 
-    creds = Credentials.from_authorized_user_info(
-        json.loads(token_json)
-    )
+def send_gmail(to_email, subject, body):
+    from email.mime.text import MIMEText
+    import base64
 
-    return creds
-
-
-def send_gmail(to_email, subject, message_text):
-    creds = get_gmail_credentials()
-
-    service = build('gmail', 'v1', credentials=creds)
-
-    message = MIMEText(message_text)
+    message = MIMEText(body)
     message['to'] = to_email
+    message['from'] = GMAIL_EMAIL
     message['subject'] = subject
 
-    # ✅ FIXED: use encode, not decode
-    raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
-
-    message_body = {'raw': raw}
-
-    service.users().messages().send(
-        userId='me',
-        body=message_body
-    ).execute()
+    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+    service.users().messages().send(userId="me", body={'raw': raw_message}).execute()

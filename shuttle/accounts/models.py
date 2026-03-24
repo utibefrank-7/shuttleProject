@@ -14,7 +14,7 @@ class CustomUser(AbstractUser):
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-  
+    is_verified = models.BooleanField(default=False)
     created_at =models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -25,8 +25,6 @@ class CustomUser(AbstractUser):
 #creating verifiation model
 
 
-class User(AbstractUser):
-    is_verified =models.BooleanField(default=False)
 
 class Driverprofile(models.Model):
 

@@ -11,12 +11,10 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from .gmail_service import send_gmail
-from .tokens import email_verification_token
-from django.utils.encoding import force_bytes
 from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode
-from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
+
 
 
 
@@ -27,85 +25,98 @@ def home_view(request):
 def about_view(request):
     return render (request, "accounts/About.html" )
 
-def feartures_view(request):
+def features_view(request):
     return render(request, "accounts/features.html" )
 
 
 def signup_view(request):
-    if request.method =="POST":
-        form =SignupForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request,user)
-            return redirect('home')
-        
 
-    else:
-        form = SignupForm()
-    return render(request, 'accounts/signup.html', {'form':form})
+        if request.method == "POST":
+            form = SignupForm(request.POST)
+
+            if form.is_valid():
+                user = form.save()
+
+                # Ensure user is not verified
+                user.is_verified = False
+                user.save()
+
+                # Generate token
+                token = default_token_generator.make_token(user)
+
+                # Create verification link
+                verification_link = request.build_absolute_uri(
+                    reverse("verify_email", args=[user.id, token])
+                )
+
+                # Send email
+                send_gmail(
+                    user.email,
+                    "Verify your account",
+                    f"Click this link to verify your account:\n{verification_link}"
+                )
+
+                # Stop here — do NOT log user in
+                return render(request, "accounts/verification_email.html")
+
+        else:
+            form = SignupForm()
+
+        return render(request, 'accounts/signup.html', {'form': form})
 
 
-def send_verification_email_view(request, user):
-    uid = urlsafe_base64_encode(force_bytes(user.pk))
-    token =email_verification_token.make_token(user)
+def send_verification_email(request, user):
+    token = default_token_generator.make_token(user)
 
-    verification_link = request.build_absolute_uri(
-        reverse('verify-email', kwargs={'uidb64':uid, 'token':token})
+    link = request.build_absolute_uri(
+        reverse('verify_email', args=[user.id, token])
     )
 
     send_gmail(
-         user.email,
-    "verify your account",
-    f"click this link to verify your account:\n{verification_link}"
-)
+        user.email,
+        "Verify your account",
+        f"Click this link to verify your account:\n{link}"
+    )
 User=get_user_model()
-def verify_email_view(request, uidb64, token):
-    try:
-        uid = urlsafe_base64_decode(uidb64).decode()
-        user =User.objects.get(pk=uid)
+def verify_email_view(request, user_id, token):
+    user = get_object_or_404(User, id=user_id)
 
-    except:
-        return HttpResponse("invalid link")
-    
-    if email_verification_token.check_token(user, token):
-        user.is_verified =True
-        user.is_active =True
+    if default_token_generator.check_token(user, token):
+        user.is_verified = True
         user.save()
-        return HttpResponse("Email Verified successfully")
+        return HttpResponse("Email verified successfully ✅")
     else:
-        return HttpResponse("invalid or expired token ")
+        return HttpResponse("Invalid or expired link ❌")
 def login_view(request):
-    if request.method =="POST":
+    if request.method == "POST":
         form = LoginForm(request, data=request.POST)
 
         if form.is_valid():
+            user = form.get_user()  # ✅ user is created here
 
-            user = form.get_user()
+            # ✅ NOW you can check verification
+            if not user.is_verified:
+                return HttpResponse("Please verify your email first.")
 
             login(request, user)
-           
-            #ROLE REDIRECTION 
 
-            if user.role =="owner":
-
+            # ROLE REDIRECTION
+            if user.role == "owner":
                 return redirect("owner_dashboard")
-            
-            elif user.role =="admin":
 
+            elif user.role == "admin":
                 return redirect("admin_dashboard")
-            
-            elif user.role =="driver":
-                
-                return redirect("driver_dashboard")
-            else:
 
+            elif user.role == "driver":
+                return redirect("driver_dashboard")
+
+            else:
                 return redirect("home")
 
     else:
-        form =LoginForm()
-    return render(request,"accounts/login.html", {"form":form})   
- 
+        form = LoginForm()
 
+    return render(request, "accounts/login.html", {"form": form})
 
 def test_email_view(request):
     send_gmail('utibefrank07@gmail.com', 'Test Email', "This is a test email from Django!")
