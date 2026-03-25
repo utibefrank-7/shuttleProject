@@ -119,8 +119,18 @@ def login_view(request):
     return render(request, "accounts/login.html", {"form": form})
 
 def test_email_view(request):
-    send_gmail('utibefrank07@gmail.com', 'Test Email', "This is a test email from Django!")
 
+    import os
+    print("EMAIL:", os.environ.get("EMAIL_HOST_USER"))
+    print("PASSWORD:", os.environ.get("EMAIL_HOST_PASSWORD"))
+    from django.core.mail import send_mail
+    send_gmail(
+        'Test Subject',
+        'Hello from Django',
+        os.environ.get("EMAIL_HOST_USER"),
+        ['utibefrank07@gmail.com'],
+        fail_silently=False,
+    )
     return  HttpResponse("Email sent!")
     
 
