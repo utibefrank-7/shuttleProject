@@ -125,12 +125,11 @@ def test_email_view(request):
     print("PASSWORD:", os.environ.get("EMAIL_HOST_PASSWORD"))
     from django.core.mail import send_mail
     send_gmail(
+        'utibefrank07@gmail.com',
         'Test Subject',
-        'Hello from Django',
-        os.environ.get("EMAIL_HOST_USER"),
-        ['utibefrank07@gmail.com'],
-        fail_silently=False,
+        'Hello from Django'
     )
+
     return  HttpResponse("Email sent!")
     
 
