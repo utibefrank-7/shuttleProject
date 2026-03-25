@@ -13,6 +13,8 @@ import os
 import dj_database_url
 from pathlib import Path
 
+from django.contrib import staticfiles
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -99,11 +101,24 @@ PASSWORD_RESET_TIMEOUT =180
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-   
+
     'default': dj_database_url.config(
         default='postgresql://shuttle_db_tpmf_user:sObEVzwF4OwnwgZRy9V3UEDG6prpB448@dpg-d6u5qjdm5p6s73bp5lgg-a.oregon-postgres.render.com/shuttle_db_tpmf'
     )
 }
+
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",  # or 'mysql', or 'sqlite3'
+#         "NAME": "shuttle",
+#         "USER": "root",           # your local db username
+#         "PASSWORD": "Wallet",    # your local db password
+#         "HOST": "localhost",
+#         "PORT": "3306",
+#     }
+# }
+
 
 
 
