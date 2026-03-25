@@ -97,14 +97,14 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 PASSWORD_RESET_TIMEOUT =180
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.getenv(
-            "DATABASE_URL",
-            "mysql://root:password@127.0.0.1:3306/shuttle_local_db"
-        )
+
+    'default': dj_database_url.config(
+        default='postgresql://shuttle_db_tpmf_user:sObEVzwF4OwnwgZRy9V3UEDG6prpB448@dpg-d6u5qjdm5p6s73bp5lgg-a.oregon-postgres.render.com/shuttle_db_tpmf'
     )
 }
+
 
 # DATABASES = {
 #     "default": {
