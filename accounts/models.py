@@ -1,6 +1,9 @@
+import uuid
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+import uuid
 
 User = settings.AUTH_USER_MODEL
 
@@ -16,15 +19,16 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     created_at =models.DateTimeField(auto_now_add=True)
-
     email = models.EmailField(unique=True)
+    verification_token = models.UUIDField(default=uuid.uuid4, editable=False)
+
 
     def __str__(self):
         return f"{self.username} -{self.role}"
     
 
 
-#creating verifiation model
+#creating verification model
 
 
 

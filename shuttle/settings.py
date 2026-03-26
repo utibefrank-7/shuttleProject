@@ -13,7 +13,14 @@ import os
 import dj_database_url
 from pathlib import Path
 
+from django.conf import STATICFILES_STORAGE_ALIAS
+from dotenv import load_dotenv
 from django.contrib import staticfiles
+
+
+
+load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,10 +30,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-15x93an@)iwcmx+1=rv0mo*e2n#_sr$2#$2*inr8*14nrfm^pc"
+SECRET_KEY = os.getenv("django-insecure-15x93an@)iwcmx+1=rv0mo*e2n#_sr$2#$2*inr8*14nrfm^pc")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -87,15 +94,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "shuttle.wsgi.application"
+
+
 EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST ='smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER =os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_USER =os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
 PASSWORD_RESET_TIMEOUT =180
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -103,7 +110,7 @@ PASSWORD_RESET_TIMEOUT =180
 DATABASES = {
 
     'default': dj_database_url.config(
-        default='postgresql://shuttle_db_tpmf_user:sObEVzwF4OwnwgZRy9V3UEDG6prpB448@dpg-d6u5qjdm5p6s73bp5lgg-a.oregon-postgres.render.com/shuttle_db_tpmf'
+        default= os.getenv('postgresql://shuttle_db_tpmf_user:sObEVzwF4OwnwgZRy9V3UEDG6prpB448@dpg-d6u5qjdm5p6s73bp5lgg-a.oregon-postgres.render.com/shuttle_db_tpmf')
     )
 }
 
@@ -158,6 +165,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

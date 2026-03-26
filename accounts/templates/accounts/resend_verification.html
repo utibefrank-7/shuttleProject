@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resend Verification Email</title>
+</head>
+<body>
+    <h2>Resend Verification Email</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color:
+                {% if message.tags == 'error' %}red
+                {% elif message.tags == 'success' %}green
+                {% else %}blue{% endif %}">
+                {{ message }}
+            </p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <label for="email">Enter your registered email:</label><br><br>
+        <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="you@example.com"
+            required
+        /><br><br>
+        <button type="submit">Resend Verification Email</button>
+    </form>
+
+    <br>
+    <a href="{% url 'login' %}">Back to Login</a>
+</body>
+</html>

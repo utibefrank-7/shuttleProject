@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Sent</title>
+</head>
+<body style="font-family: Arial, sans-serif; background:#f4f4f4; padding:20px;">
+
+    <div style="max-width:500px; margin:auto; background:white; padding:20px; border-radius:10px;">
+
+        <h2 style="color:#333;">Check Your Email ✅</h2>
+
+        <p>A verification link has been sent to <strong>{{ email }}</strong>.</p>
+
+        <p>The link expires in <strong>3 minutes</strong>. If it expires, you can request a new one below.</p>
+
+        <a href="{% url 'resend-verification' %}"
+           style="display:inline-block; padding:10px 20px; background:#4CAF50; color:white; text-decoration:none; border-radius:5px;">
+           Resend Verification Email
+        </a>
+
+    </div>
+
+</body>
+</html>
