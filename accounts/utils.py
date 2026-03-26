@@ -2,6 +2,7 @@ from django.core.mail import send_mail,EmailMultiAlternatives
 from django.urls import reverse
 from django.conf import settings
 from django.template.loader import render_to_string
+import threading
 
 
 
@@ -22,4 +23,6 @@ def send_verification_email(request, user):
         to=[user.email],
     )
     email.attach_alternative(html_content, "text/html")
-    email.send()
+    thread = threading.Thread(target=send_mail)
+    thread.daemon = True
+    thread.start()
