@@ -1,10 +1,11 @@
-import threading
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
+import resend
+import os
 from django.urls import reverse
-from django.conf import settings
+from django.template.loader import render_to_string
 
 def send_verification_email(request, user):
+    resend.api_key = os.getenv('RESEND_API_KEY')
+
     token = user.verification_token
     verify_url = request.build_absolute_uri(
         reverse('verify-email', kwargs={'token': str(token)})
@@ -15,15 +16,9 @@ def send_verification_email(request, user):
         'verification_link': verify_url,
     })
 
-    email = EmailMultiAlternatives(
-        subject='Verify your email address',
-        body=f'Hi {user.username}, click this link to verify: {verify_url}',
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[user.email],
-    )
-    email.attach_alternative(html_content, "text/html")
-
-    # ✅ call email.send not send_mail
-    thread = threading.Thread(target=email.send)
-    thread.daemon = True
-    thread.start()
+    resend.Emails.send({
+        "from": "onboarding@resend.dev",  # use this until you verify a domain
+        "to": user.email,
+        "subject": "Verify your email address",
+        "html": html_content,
+    })
