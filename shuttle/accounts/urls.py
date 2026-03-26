@@ -7,7 +7,8 @@ register_bus_view,approve_bus_view, reject_bus_view,
 approve_application_view,reject_application_view, assign_driver_view,
 about_view, features_view, admin_driver_applications_view,
 admin_bus_management_view,delete_bus_view,driver_assigned_bus_view,
-update_bus_view,test_email_view,verify_email_view)
+update_bus_view,test_email_view,verify_email_view, resend_verification_view
+)
 
 urlpatterns=[
     path('', home_view, name='home'),
@@ -44,6 +45,8 @@ urlpatterns=[
     path("assign-driver/<int:bus_id>/", assign_driver_view, name="assign_driver"),
 
     path('test-email/', test_email_view, name="test_email"),
-    path('verify/<int:user_id>/<str:token>/',verify_email_view, name='verify_email')
+    path('verify-email/<uuid:token>/',verify_email_view, name='verify-email'),
+path('resend-verification/', resend_verification_view, name='resend-verification'),  # add this
+
    
 ]       

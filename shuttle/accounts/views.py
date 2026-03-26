@@ -1,4 +1,6 @@
-from django.shortcuts import render,redirect 
+import uuid
+
+from django.shortcuts import render,redirect
 from .forms import SignupForm, LoginForm
 from django.contrib.auth import login 
 from django.contrib.auth.decorators import login_required
@@ -14,6 +16,9 @@ from .gmail_service import send_gmail
 from django.urls import reverse
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
+from .utils import send_verification_email
+from django.utils import timezone
+from datetime import timedelta
 
 
 
@@ -39,25 +44,13 @@ def signup_view(request):
 
                 # Ensure user is not verified
                 user.is_verified = False
+                user.is_active = False
+                user.token_created = timezone.now()
                 user.save()
 
-                # Generate token
-                token = default_token_generator.make_token(user)
+                send_verification_email(request, user)
 
-                # Create verification link
-                verification_link = request.build_absolute_uri(
-                    reverse("verify_email", args=[user.id, token])
-                )
-
-                # Send email
-                send_gmail(
-                    user.email,
-                    "Verify your account",
-                    f"Click this link to verify your account:\n{verification_link}"
-                )
-
-                # Stop here — do NOT log user in
-                return render(request, "accounts/verification_email.html")
+                return render(request, "accounts/email_sent.html", {'email': user.email})
 
         else:
             form = SignupForm()
@@ -65,28 +58,35 @@ def signup_view(request):
         return render(request, 'accounts/signup.html', {'form': form})
 
 
-def send_verification_email(request, user):
-    token = default_token_generator.make_token(user)
-
-    link = request.build_absolute_uri(
-        reverse('verify_email', args=[user.id, token])
-    )
-
-    send_gmail(
-        user.email,
-        "Verify your account",
-        f"Click this link to verify your account:\n{link}"
-    )
 User=get_user_model()
-def verify_email_view(request, user_id, token):
-    user = get_object_or_404(User, id=user_id)
+def verify_email_view(request, token):
+    try:
+        uuid.UUID(str(token))
 
-    if default_token_generator.check_token(user, token):
-        user.is_verified = True
-        user.save()
-        return HttpResponse("Email verified successfully ✅")
-    else:
-        return HttpResponse("Invalid or expired link ❌")
+    except ValueError:
+        return HttpResponse('Invalid verification link', status=400)
+
+    user = get_object_or_404(User, verification_token=token)
+
+    expiry_time = user.token_created_at + timedelta(minutes=3)
+    if timezone.now() > expiry_time:
+        return HttpResponse(
+            "Your verification link has expired. It is only valid for 3 minutes. Please request a new one.",
+            status=410
+        )
+
+    if user.is_verified:
+        messages.info(request, 'Account already verified. Please login.')
+        return redirect('login')
+
+    user.is_verified = True
+    user.is_active = True
+    user.save()
+
+    messages.success(request, 'Email verified! You can now log in.')
+    return redirect('login')
+
+
 def login_view(request):
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
@@ -96,7 +96,7 @@ def login_view(request):
 
             # ✅ NOW you can check verification
             if not user.is_verified:
-                return HttpResponse("Please verify your email first.")
+                return render(request, "accounts/email_sent.html", {'email': user.email})
 
             login(request, user)
 
@@ -131,6 +131,40 @@ def test_email_view(request):
     )
 
     return  HttpResponse("Email sent!")
+
+
+#resending verification testing
+
+
+def resend_verification_view(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "No account found with that email.")
+            return redirect('resend-verification')
+
+        # If already verified no need to resend
+        if user.is_verified:
+            messages.info(request, "Your account is already verified. Please login.")
+            return redirect('login')
+
+        # Generate a fresh token and reset the timer
+        user.verification_token = uuid.uuid4()
+        user.token_created_at = timezone.now()
+        user.save()
+
+        send_verification_email(request, user)
+
+        messages.success(request, "A new verification email has been sent. You have 3 minutes to verify.")
+        return redirect('resend-verification')
+
+    return render(request, "accounts/resend_verification.html")
+
+
+
     
 
 #@login_required for login protection 
