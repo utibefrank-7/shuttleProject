@@ -23,6 +23,7 @@ def send_verification_email(request, user):
         to=[user.email],
     )
     email.attach_alternative(html_content, "text/html")
-    thread = threading.Thread(target=send_mail)
+
+    thread = threading.Thread(target=email.send)
     thread.daemon = True
     thread.start()
