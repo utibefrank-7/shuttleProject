@@ -18,7 +18,7 @@ def send_verification_email(request, user):
 
     resend.Emails.send({
         "from": "onboarding@resend.dev",  # use this until you verify a domain
-        "to": user.email,
+        "to": "utibefrank07@gmail.com",
         "subject": "Verify your email address",
         "html": html_content,
     })
