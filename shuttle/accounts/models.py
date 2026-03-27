@@ -21,6 +21,7 @@ class CustomUser(AbstractUser):
     created_at =models.DateTimeField(auto_now_add=True)
     email = models.EmailField(unique=True)
     verification_token = models.UUIDField(default=uuid.uuid4, editable=False)
+    token_created_at =models.DateTimeField(null=True, blank=True)
 
 
     def __str__(self):
