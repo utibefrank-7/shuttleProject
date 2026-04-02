@@ -14,6 +14,8 @@ google-api-python-client
 google-auth
 google-auth-oauthlib
 channels
+channels-redis
+daphne
 resend
 
 dj-config-url
