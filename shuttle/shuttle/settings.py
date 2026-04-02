@@ -13,6 +13,7 @@ import os
 import dj_database_url
 from pathlib import Path
 
+from asgiref.typing import ASGIApplication
 from django.conf import STATICFILES_STORAGE_ALIAS
 from dotenv import load_dotenv
 from django.contrib import staticfiles
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "tailwind",
     "theme",
+    "channels",
     
 ]
 
@@ -94,7 +96,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "shuttle.wsgi.application"
+ASGI_APPLICATION = "shuttle.asgi.application"
+CHANNEL_LAYERS = {
+    'default': {
+    'BACKEND':'channels_redis.core.RedisChannelLayer',
+    'CONFIG':{
+        'hosts':[os.getenv('REDIS_URL', 'redis://localhost:6379')]
 
+
+    },
+    },
+},
 
 EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST ='smtp.gmail.com'

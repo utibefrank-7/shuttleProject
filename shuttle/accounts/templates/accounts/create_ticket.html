@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Complaint</title>
+</head>
+<body>
+
+    <h2>Submit a Complaint</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color:red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <label for="subject">Subject</label><br>
+        <input
+            type="text"
+            name="subject"
+            id="subject"
+            placeholder="Briefly describe your complaint"
+            required
+        /><br><br>
+        <button type="submit">Submit Complaint</button>
+    </form>
+
+</body>
+</html>
