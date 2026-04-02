@@ -8,7 +8,7 @@ approve_application_view,reject_application_view, assign_driver_view,
 about_view, features_view, admin_driver_applications_view,
 admin_bus_management_view,delete_bus_view,driver_assigned_bus_view,
 update_bus_view,test_email_view,verify_email_view, resend_verification_view,
-ticket_detail_view, create_ticket_view, close_ticket_view
+ticket_detail_view, create_ticket_view, close_ticket_view,all_tickets_view
 )
 
 urlpatterns=[
