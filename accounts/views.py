@@ -13,12 +13,11 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from .gmail_service import send_gmail
-from django.urls import reverse
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
 from .utils import send_verification_email
 from django.utils import timezone
 from datetime import timedelta
+from .models import ComplaintMessage,ComplaintTicket
 
 
 
@@ -491,23 +490,61 @@ def assign_driver_view(request, bus_id):
 
    return redirect("admin_dashboard")
 
-
-
-
-
-
-
-
-
 def delete_bus_view(request, bus_id):
     bus =Bus.objects.get(id=bus_id)
     bus.delete()
     return redirect("bus_management")
 
+def create_ticket_view(request):
+    if request.method =="POST":
+        subject =request.POST.get("subject")
+
+        if not subject:
+            messages.error(request,"Please provide a subject")
+            return redirect("create_ticket")
+
+        ticket =ComplaintTicket.objects.create(
+            user=request.user,
+            subject=subject
+        )
+        return redirect("ticket_detail", ticket_id=ticket.id)
+
+    return render(request, 'accounts/create_ticket.html')
 
 
+def all_tickets_view(request):
+    if request.user.role != 'admin':
+        messages.error(request, 'Access denied.')
+        return redirect('home')
 
+    tickets = ComplaintTicket.objects.all().order_by('-created_at')
+    context = {
+        'tickets': tickets  # ✅ key must be a string
+    }
+    return render(request, 'accounts/all_tickets.html', context)  # ✅ template name
 
+#Admin sees all tickets
+def ticket_detail_view(request, ticket_id):
+    ticket =get_object_or_404(ComplaintTicket, id=ticket_id)
+
+    if request.user.role!= "admin":
+        messages.error(request,"Access denied.")
+        return redirect("home")
+
+    tickets =ComplaintTicket.objects.all().order_by("-created_at")
+    return render(request, 'accounts/all_tickets.html', {tickets:tickets})
+
+#Admin closes a ticket
+def close_ticket_view(request, ticket_id):
+    if request.user.role!= "admin":
+        messages.error(request,"Access denied.")
+        return redirect("home")
+
+    ticket= get_object_or_404(ComplaintTicket, id=ticket_id)
+    ticket.status = "closed"
+    ticket.save()
+    messages.success(request,"Ticket closed successfully")
+    return redirect("all-tickets")
 
 
 def logout_view(request):

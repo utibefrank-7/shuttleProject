@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Complaints</title>
+</head>
+<body>
+
+    <h2>All Complaint Tickets</h2>
+
+    {% if tickets %}
+        <table border="1" cellpadding="10">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.id }}</td>
+                    <td>{{ ticket.user.username }}</td>
+                    <td>{{ ticket.subject }}</td>
+                    <td>{{ ticket.get_status_display }}</td>
+                    <td>{{ ticket.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{% url 'ticket-detail' ticket.id %}">Open Chat</a>
+                        {% if ticket.status != 'closed' %}
+                            | <a href="{% url 'close-ticket' ticket.id %}">Close</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No complaints yet.</p>
+    {% endif %}
+
+</body>
+</html>

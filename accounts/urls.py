@@ -7,7 +7,8 @@ register_bus_view,approve_bus_view, reject_bus_view,
 approve_application_view,reject_application_view, assign_driver_view,
 about_view, features_view, admin_driver_applications_view,
 admin_bus_management_view,delete_bus_view,driver_assigned_bus_view,
-update_bus_view,test_email_view,verify_email_view, resend_verification_view
+update_bus_view,test_email_view,verify_email_view, resend_verification_view,
+ticket_detail_view, create_ticket_view, close_ticket_view
 )
 
 urlpatterns=[
@@ -46,7 +47,10 @@ urlpatterns=[
 
     path('test-email/', test_email_view, name="test_email"),
     path('verify-email/<uuid:token>/',verify_email_view, name='verify-email'),
-path('resend-verification/', resend_verification_view, name='resend-verification'),  # add this
+    path('resend-verification/', resend_verification_view, name='resend-verification'),  # add this
 
-   
+path('tickets/', all_tickets_view, name='all-tickets'),
+path('tickets/create/', create_ticket_view, name='create-ticket'),
+path('tickets/<int:ticket_id>/', ticket_detail_view, name='ticket-detail'),
+path('tickets/<int:ticket_id>/close/', close_ticket_view, name='close-ticket'),
 ]       
