@@ -7,7 +7,7 @@ def create_admin():
     username = os.getenv("DJANGO_SUPERUSER_USERNAME")
     email = os.getenv("DJANGO_SUPERUSER_EMAIL")
     password = os.getenv("DJANGO_SUPERUSER_PASSWORD")
-    role =os.getenv("DJANGO_SUPERUSER_ROLE")
+    role = os.getenv("DJANGO_SUPERUSER_ROLE", "admin")  # default to admin
 
     if not username or not password:
         return
@@ -19,11 +19,13 @@ def create_admin():
             password=password
         )
 
-        if hasattr(user, role):
-            user.role ="admin"
+        if hasattr(user, 'role'):
+            user.role = role  # ✅ use the variable
 
-
-        if hasattr(user, "is_verified"):
+        if hasattr(user, 'is_verified'):
             user.is_verified = True
 
         user.save()
+        print(f"Admin user '{username}' created successfully.")  # helpful log
+    else:
+        print(f"Admin user '{username}' already exists.")  # helpful log
