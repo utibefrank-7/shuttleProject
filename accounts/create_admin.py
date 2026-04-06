@@ -7,25 +7,25 @@ def create_admin():
     username = os.getenv("DJANGO_SUPERUSER_USERNAME")
     email = os.getenv("DJANGO_SUPERUSER_EMAIL")
     password = os.getenv("DJANGO_SUPERUSER_PASSWORD")
-    role = os.getenv("DJANGO_SUPERUSER_ROLE", "admin")  # default to admin
+    role = os.getenv("DJANGO_SUPERUSER_ROLE", "admin")
 
     if not username or not password:
         return
 
-    if not User.objects.filter(username=username).exists():
+    try:
+        # Delete existing admin and recreate with correct fields
+        User.objects.filter(username=username).delete()
+
         user = User.objects.create_superuser(
             username=username,
             email=email,
-            password=password
+            password=password,
+            role=role,
+            is_verified=True,
+            is_active=True
         )
-
-        if hasattr(user, 'role'):
-            user.role = role  # ✅ use the variable
-
-        if hasattr(user, 'is_verified'):
-            user.is_verified = True
-
         user.save()
-        print(f"Admin user '{username}' created successfully.")  # helpful log
-    else:
-        print(f"Admin user '{username}' already exists.")  # helpful log
+        print(f"Admin user '{username}' created successfully.")
+
+    except Exception as e:
+        print(f"Error creating admin: {str(e)}")
