@@ -511,7 +511,7 @@ def create_ticket_view(request):
 
     return render(request, 'accounts/create_ticket.html')
 
-
+@login_required(login_url='login')
 def all_tickets_view(request):
     if request.user.role != 'admin':
         messages.error(request, 'Access denied.')
