@@ -1,4 +1,3 @@
-import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
@@ -125,13 +124,20 @@ class ComplaintTicket(models.Model):
         ("closed", "CLOSED"),
     )
 
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='tickets',
+        blank = True,
+        null = True
+    )
+
     subject = models.CharField(max_length=100)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f" {self.user.username} - {self.subject}"
-
+        return f"{self.user.username} - {self.subject}"
 
 class ComplaintMessage(models.Model):
     ticket = models.ForeignKey(
