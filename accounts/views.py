@@ -486,13 +486,13 @@ def create_ticket_view(request):
 
         if not subject:
             messages.error(request, "Please provide a subject")
-            return redirect("create_ticket")
+            return redirect("create-ticket")
 
         ticket = ComplaintTicket.objects.create(
             user=request.user,
             subject=subject
         )
-        return redirect("ticket_detail", ticket_id=ticket.id)
+        return redirect("ticket-detail", ticket_id=ticket.id)
 
     return render(request, 'accounts/create_ticket.html')
 
