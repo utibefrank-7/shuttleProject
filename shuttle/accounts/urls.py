@@ -51,6 +51,6 @@ urlpatterns=[
 
 path('tickets/', all_tickets_view, name='all-tickets'),
 path('tickets/create/', create_ticket_view, name='create-ticket'),
-path('tickets/<int:ticket_id>/', ticket_detail_view, name='ticket-detail'),
+path('ticket-detail/<int:ticket_id>/', ticket_detail_view, name='ticket-detail'),
 path('tickets/<int:ticket_id>/close/', close_ticket_view, name='close-ticket'),
 ]       
