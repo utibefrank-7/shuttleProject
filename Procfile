@@ -1,1 +1,1 @@
-web: gunicorn shuttle.wsgi
+web: daphne shuttle.asgi:application --port $PORT --bind 0.0.0.0
