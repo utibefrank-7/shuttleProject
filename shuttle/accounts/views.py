@@ -511,6 +511,7 @@ def all_tickets_view(request):
 
 
 #Admin sees all tickets
+@login_required(login_url="login")
 def ticket_detail_view(request, ticket_id):
     ticket = get_object_or_404(ComplaintTicket, id=ticket_id)
 
